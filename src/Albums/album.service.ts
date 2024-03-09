@@ -2,12 +2,14 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { Album } from "./interface/album.interface";
 import { CreateAlbumDTO } from "./dto/CreateAlbum.dto";
 import { validate as uuidValidate, v4 as uuidv4 } from 'uuid';
-import { NotFoundError } from "rxjs";
 import { UpdateAlbumDTO } from "./dto/UpdateAlbum.dto";
+import { EventEmitter2 } from 'eventemitter2';
 
 @Injectable()
 
 export class AlbumService {
+    constructor(private eventEmitter: EventEmitter2) {}
+
     albums: Album[] = [];
 
     getAlbums(): Album[] {
@@ -49,6 +51,7 @@ export class AlbumService {
         this.albums = this.albums.filter((album) => 
         album.id !== id
         );
+        this.eventEmitter.emit('delete.album', id);
     }
 
     updateAlbum(id: string, dto: UpdateAlbumDTO): Album {
@@ -69,5 +72,20 @@ export class AlbumService {
           album.id === id ? updatedAlbum : album,
         );
         return updatedAlbum;
+      }
+
+      deleteId(type: string, id: string) {
+        this.albums = this.albums.map((album) => {
+          if (album[type + 'Id'] === id) {
+            return { ...album, [type + 'Id']: null };
+          }
+          return album;
+        });
+      }
+
+      findByIds(ids: string[]): Album[] {
+        return this.albums.filter((album) =>
+         ids.includes(album.id)
+         );
       }
 }

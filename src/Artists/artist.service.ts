@@ -3,10 +3,13 @@ import { Artist } from "./interface/artist.interface";
 import { CreateArtistDTO } from "./dto/CreateArtist.dto";
 import { validate as uuidValidate, v4 as uuidv4 } from 'uuid';
 import { UpdateArtistDTO } from "./dto/UpdateArtist.dto";
+import { EventEmitter2 } from 'eventemitter2';
 
 @Injectable()
 
 export class ArtistService {
+    constructor(private eventEmitter: EventEmitter2) {}
+
     artists: Artist[] = [];
 
     getArtists():Artist[] {
@@ -35,7 +38,7 @@ export class ArtistService {
         return SearchArtist;
     }
 
-    deleteArtist(id: string): {message: string} {
+    deleteArtist(id: string): void {
         if (!uuidValidate(id)) {
             throw new BadRequestException('Not Valid');
         }
@@ -48,7 +51,7 @@ export class ArtistService {
         this.artists = this.artists.filter((artist) => 
         artist.id !== id
         );
-        return {message: 'Delete'};
+        this.eventEmitter.emit('delete.artist', id);
     }
 
     updateArtist(id: string, Dto: UpdateArtistDTO): Artist {
@@ -70,4 +73,10 @@ export class ArtistService {
         );
         return updateArtist;
     }
+
+    findByIds(ids: string[]): Artist[] {
+        return this.artists.filter((artist) =>
+        ids.includes(artist.id)
+        );
+      }
 }
