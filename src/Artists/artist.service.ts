@@ -1,5 +1,73 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Artist } from "./interface/artist.interface";
+import { CreateArtistDTO } from "./dto/CreateArtist.dto";
+import { validate as uuidValidate, v4 as uuidv4 } from 'uuid';
+import { UpdateArtistDTO } from "./dto/UpdateArtist.dto";
 
 @Injectable()
 
-export class ArtistService {}
+export class ArtistService {
+    artists: Artist[] = [];
+
+    getArtists():Artist[] {
+        return this.artists;
+    }
+
+    createArtist(Dto: CreateArtistDTO): Artist {
+        const artist = {
+            id: uuidv4(),
+            ...Dto,
+        };
+        this.artists.push(artist);
+        return artist;
+    }
+
+    getArtist(id: string): Artist {
+        if (!uuidValidate(id)) {
+            throw new BadRequestException('Not valid');
+        }
+        const SearchArtist = this.artists.find((artist) => 
+        artist.id === id
+        );
+        if (!SearchArtist) {
+            throw new NotFoundException('Not Found');
+        }
+        return SearchArtist;
+    }
+
+    deleteArtist(id: string): {message: string} {
+        if (!uuidValidate(id)) {
+            throw new BadRequestException('Not Valid');
+        }
+        const findArtist = this.artists.find((artist) => 
+        artist.id = id
+        );
+        if (!findArtist) {
+            throw new NotFoundException('Not Found');
+        }
+        this.artists = this.artists.filter((artist) => 
+        artist.id !== id
+        );
+        return {message: 'Delete'};
+    }
+
+    updateArtist(id: string, Dto: UpdateArtistDTO): Artist {
+        if (!uuidValidate(id)) {
+            throw new BadRequestException('Not Valid');
+        }
+        const findArtist = this.artists.find((artist) =>
+        artist.id === id
+        );
+        if (!findArtist) {
+            throw new NotFoundException('Not Found');
+        }
+        const updateArtist = {
+            ...findArtist,
+            ...Dto,
+        };
+        this.artists = this.artists.map((artist) =>
+        artist.id === id ? updateArtist : artist,
+        );
+        return updateArtist;
+    }
+}
