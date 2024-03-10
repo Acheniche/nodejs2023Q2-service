@@ -1,31 +1,41 @@
-import { Controller, Delete, Get, HttpCode, Param, Post } from "@nestjs/common";
-import { FavoriteService } from "./favorite.service";
-import { FavoritesResponse } from "./interface/favorites.interface";
-import { Artist } from "src/Artists/interface/artist.interface";
-import { Album } from "src/Albums/interface/album.interface";
-import { Track } from "src/Tracks/interface/track.interface";
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
+import { FavoriteService } from './favorite.service';
+import { FavoritesResponse } from './interface/favorites.interface';
+import { Artist } from 'src/Artists/interface/artist.interface';
+import { Album } from 'src/Albums/interface/album.interface';
+import { Track } from 'src/Tracks/interface/track.interface';
 
 @Controller('favorite')
-
 export class FavoriteController {
-    constructor(private readonly favsService: FavoriteService) {}
-    
-    @Get()
-    getFavorites(): FavoritesResponse {
-      return this.favsService.getFavorites();
-    }
+  constructor(private readonly favsService: FavoriteService) {}
 
-    @Delete('/:type/:id')
-    @HttpCode(204)
-    deleteFavorite(@Param('type') type: string, @Param('id') id: string): void {
-      this.favsService.deleteFavorite(type, id);
-    }
+  @Get()
+  getFavorites(): FavoritesResponse {
+    return this.favsService.getFavorites();
+  }
 
-    @Post('/:type/:id')
-    addFavorite(
-      @Param('type') type: string,
-      @Param('id') id: string,
-    ): Artist | Album | Track {
-      return this.favsService.addFavorite(type, id);
-    }
+  @Delete('/:type/:id')
+  @HttpCode(204)
+  deleteFavorite(
+    @Param('type') type: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): void {
+    this.favsService.deleteFavorite(type, id);
+  }
+
+  @Post('/:type/:id')
+  addFavorite(
+    @Param('type') type: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ): Artist | Album | Track {
+    return this.favsService.addFavorite(type, id);
+  }
 }

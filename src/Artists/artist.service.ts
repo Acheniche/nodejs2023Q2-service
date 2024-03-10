@@ -1,82 +1,62 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { Artist } from "./interface/artist.interface";
-import { CreateArtistDTO } from "./dto/CreateArtist.dto";
-import { validate as uuidValidate, v4 as uuidv4 } from 'uuid';
-import { UpdateArtistDTO } from "./dto/UpdateArtist.dto";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Artist } from './interface/artist.interface';
+import { CreateArtistDTO } from './dto/CreateArtist.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { UpdateArtistDTO } from './dto/UpdateArtist.dto';
 import { EventEmitter2 } from 'eventemitter2';
 
 @Injectable()
-
 export class ArtistService {
-    constructor(private eventEmitter: EventEmitter2) {}
+  constructor(private eventEmitter: EventEmitter2) {}
 
-    artists: Artist[] = [];
+  artists: Artist[] = [];
 
-    getArtists():Artist[] {
-        return this.artists;
+  getArtists(): Artist[] {
+    return this.artists;
+  }
+
+  createArtist(Dto: CreateArtistDTO): Artist {
+    const artist = {
+      id: uuidv4(),
+      ...Dto,
+    };
+    this.artists.push(artist);
+    return artist;
+  }
+
+  getArtist(id: string): Artist {
+    const SearchArtist = this.artists.find((artist) => artist.id === id);
+    if (!SearchArtist) {
+      throw new NotFoundException('Not Found');
     }
+    return SearchArtist;
+  }
 
-    createArtist(Dto: CreateArtistDTO): Artist {
-        const artist = {
-            id: uuidv4(),
-            ...Dto,
-        };
-        this.artists.push(artist);
-        return artist;
+  deleteArtist(id: string): void {
+    const findArtist = this.artists.find((artist) => (artist.id = id));
+    if (!findArtist) {
+      throw new NotFoundException('Not Found');
     }
+    this.artists = this.artists.filter((artist) => artist.id !== id);
+    this.eventEmitter.emit('delete.artist', id);
+  }
 
-    getArtist(id: string): Artist {
-        if (!uuidValidate(id)) {
-            throw new BadRequestException('Not valid');
-        }
-        const SearchArtist = this.artists.find((artist) => 
-        artist.id === id
-        );
-        if (!SearchArtist) {
-            throw new NotFoundException('Not Found');
-        }
-        return SearchArtist;
+  updateArtist(id: string, Dto: UpdateArtistDTO): Artist {
+    const findArtist = this.artists.find((artist) => artist.id === id);
+    if (!findArtist) {
+      throw new NotFoundException('Not Found');
     }
+    const updateArtist = {
+      ...findArtist,
+      ...Dto,
+    };
+    this.artists = this.artists.map((artist) =>
+      artist.id === id ? updateArtist : artist,
+    );
+    return updateArtist;
+  }
 
-    deleteArtist(id: string): void {
-        if (!uuidValidate(id)) {
-            throw new BadRequestException('Not Valid');
-        }
-        const findArtist = this.artists.find((artist) => 
-        artist.id = id
-        );
-        if (!findArtist) {
-            throw new NotFoundException('Not Found');
-        }
-        this.artists = this.artists.filter((artist) => 
-        artist.id !== id
-        );
-        this.eventEmitter.emit('delete.artist', id);
-    }
-
-    updateArtist(id: string, Dto: UpdateArtistDTO): Artist {
-        if (!uuidValidate(id)) {
-            throw new BadRequestException('Not Valid');
-        }
-        const findArtist = this.artists.find((artist) =>
-        artist.id === id
-        );
-        if (!findArtist) {
-            throw new NotFoundException('Not Found');
-        }
-        const updateArtist = {
-            ...findArtist,
-            ...Dto,
-        };
-        this.artists = this.artists.map((artist) =>
-        artist.id === id ? updateArtist : artist,
-        );
-        return updateArtist;
-    }
-
-    findByIds(ids: string[]): Artist[] {
-        return this.artists.filter((artist) =>
-        ids.includes(artist.id)
-        );
-      }
+  findByIds(ids: string[]): Artist[] {
+    return this.artists.filter((artist) => ids.includes(artist.id));
+  }
 }

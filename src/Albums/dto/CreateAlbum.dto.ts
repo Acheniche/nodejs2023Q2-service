@@ -1,19 +1,25 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateAlbumDTO {
-    @IsNotEmpty()
-    @IsString()
-    name: string;
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
-    @IsOptional()
-    @IsBoolean()
-    grammy: boolean;
+  @IsOptional()
+  @IsBoolean()
+  grammy: boolean;
 
-    @IsOptional()
-    @IsNumber()
-    year: number;
+  @IsOptional()
+  @IsNumber()
+  year: number;
 
-    @IsOptional()
-    @IsString()
-    artistId: string | null;
+  @IsOptional()
+  @IsString()
+  artistId: string | null;
 }
