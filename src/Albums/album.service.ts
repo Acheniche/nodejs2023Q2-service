@@ -33,8 +33,8 @@ export class AlbumService {
   }
 
   deleteAlbum(id: string): void {
-    const findedAlbum = this.albums.find((album) => album.id === id);
-    if (!findedAlbum) {
+    const findAlbum = this.albums.find((album) => album.id === id);
+    if (!findAlbum) {
       throw new NotFoundException('Not Found');
     }
     this.albums = this.albums.filter((album) => album.id !== id);

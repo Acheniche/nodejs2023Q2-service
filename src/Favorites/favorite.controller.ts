@@ -13,7 +13,7 @@ import { Artist } from 'src/Artists/interface/artist.interface';
 import { Album } from 'src/Albums/interface/album.interface';
 import { Track } from 'src/Tracks/interface/track.interface';
 
-@Controller('favorite')
+@Controller('favs')
 export class FavoriteController {
   constructor(private readonly favsService: FavoriteService) {}
 
