@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  main:
+    container_name: node-service
+    build: 
+      context: .
+    env_file: 
+      - .env
+    volumes:
+      - .:/user/src/app
+      - /user/src/app/node_modules
+    ports:
+      - '${PORT}:${PORT}'
+    command: npm run start:dev
+    depends_on:
+      - postgres
+    networks:
+      - node-postgres-bridge
+    restart: always
+
+  postgres:
+    container_name: postgres-service 
+    build: 
+      context: ./db/
+    env_file: 
+      - .env
+    volumes:
+      - db:/var/lib/postgresql/data
+      - db-logs:/logs
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    networks:
+      - node-postgres-bridge
+    restart: always
+
+volumes:
+  db:
+  db-logs:
+networks:
+  node-postgres-bridge:
+    driver: bridge

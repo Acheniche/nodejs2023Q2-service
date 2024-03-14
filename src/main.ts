@@ -2,10 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { HeadersInterceptor } from './main/main.interceptor';
-import { dirname, join } from 'path';
-import { readFile } from 'fs/promises';
-import { SwaggerModule } from '@nestjs/swagger';
-import { parse } from 'yaml';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 const PORT: number = +process.env.PORT || 4000;
 
@@ -14,11 +11,15 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new HeadersInterceptor());
 
-  const rootDir = dirname(__dirname);
-  const API = await readFile(join(rootDir, 'doc', 'api.yaml'), 'utf-8');
-  const document = parse(API);
+  const config = new DocumentBuilder()
+    .setTitle('Home Library Service')
+    .setDescription('Home Library Service')
+    .setVersion('1.0.0')
+    .build();
 
-  SwaggerModule.setup('doc', app, document);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
+
 
   await app.listen(PORT);
 }
