@@ -9,7 +9,7 @@ services:
       - .env
     volumes:
       - .:/user/src/app
-      - /user/src/app/node_modules
+      # - /user/src/app/node_modules
     ports:
       - '${PORT}:${PORT}'
     command: npm run start:dev

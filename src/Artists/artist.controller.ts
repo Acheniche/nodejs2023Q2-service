@@ -10,26 +10,26 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
-import { Artist } from './interface/artist.interface';
 import { CreateArtistDTO } from './dto/CreateArtist.dto';
 import { UpdateArtistDTO } from './dto/UpdateArtist.dto';
+import { Artist } from './entity/artist.entity';
 
 @Controller('artist')
 export class ArtistController {
   constructor(private readonly artistServices: ArtistService) {}
 
   @Get()
-  getArtists(): Artist[] {
+  getArtists(): Promise<Artist[]> {
     return this.artistServices.getArtists();
   }
 
   @Get(':id')
-  getArtist(@Param('id', new ParseUUIDPipe()) id: string): Artist {
+  getArtist(@Param('id', new ParseUUIDPipe()) id: string): Promise<Artist> {
     return this.artistServices.getArtist(id);
   }
 
   @Post()
-  createArtist(@Body() Dto: CreateArtistDTO): Artist {
+  createArtist(@Body() Dto: CreateArtistDTO): Promise<Artist> {
     return this.artistServices.createArtist(Dto);
   }
 
@@ -43,7 +43,7 @@ export class ArtistController {
   updateArtist(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() Dto: UpdateArtistDTO,
-  ): Artist {
+  ): Promise<Artist> {
     return this.artistServices.updateArtist(id, Dto);
   }
 }

@@ -5,19 +5,20 @@ import { favoriteModule } from './Favorites/favorite.module';
 import { TrackModule } from './Tracks/track.module';
 import { UserModule } from './Users/user.module';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { MainModule } from './main/main.module';
+import { config } from './typeORM';
 
 @Module({
   imports: [
-    EventEmitterModule.forRoot(),
     ConfigModule.forRoot(),
     AlbumModule,
     ArtistModule,
     favoriteModule,
     TrackModule,
     UserModule,
-    MainModule,
+    EventEmitterModule.forRoot(),
+    TypeOrmModule.forRoot(config),
   ],
 })
 export class AppModule {}
