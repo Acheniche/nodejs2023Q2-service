@@ -1,62 +1,52 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Artist } from './interface/artist.interface';
 import { CreateArtistDTO } from './dto/CreateArtist.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { UpdateArtistDTO } from './dto/UpdateArtist.dto';
-import { EventEmitter2 } from 'eventemitter2';
+import { Artist } from './entity/artist.entity';
+import { Repository, In } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ArtistService {
-  constructor(private eventEmitter: EventEmitter2) {}
+  constructor(
+    @InjectRepository(Artist)
+    private artistRepository: Repository<Artist>,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
-  artists: Artist[] = [];
-
-  getArtists(): Artist[] {
-    return this.artists;
+  async getArtists() {
+    return this.artistRepository.find();
   }
 
-  createArtist(Dto: CreateArtistDTO): Artist {
-    const artist = {
-      id: uuidv4(),
-      ...Dto,
-    };
-    this.artists.push(artist);
-    return artist;
+  async createArtist(artistDto: CreateArtistDTO) {
+    return this.artistRepository.save(artistDto);
   }
 
-  getArtist(id: string): Artist {
-    const SearchArtist = this.artists.find((artist) => artist.id === id);
-    if (!SearchArtist) {
-      throw new NotFoundException('Not Found');
-    }
-    return SearchArtist;
+  async getArtist(id: string) {
+    const findedArtist = await this.artistRepository.findOneBy({ id });
+    if (!findedArtist) throw new NotFoundException('Not Found');
+    return findedArtist;
   }
 
-  deleteArtist(id: string): void {
-    const findArtist = this.artists.find((artist) => (artist.id = id));
-    if (!findArtist) {
-      throw new NotFoundException('Not Found');
-    }
-    this.artists = this.artists.filter((artist) => artist.id !== id);
+  async deleteArtist(id: string): Promise<void> {
+    const findedArtist = await this.artistRepository.findOneBy({ id });
+    if (!findedArtist) throw new NotFoundException('Not Found');
     this.eventEmitter.emit('delete.artist', id);
+    await this.artistRepository.delete(id);
   }
 
-  updateArtist(id: string, Dto: UpdateArtistDTO): Artist {
-    const findArtist = this.artists.find((artist) => artist.id === id);
-    if (!findArtist) {
-      throw new NotFoundException('Not Found');
-    }
-    const updateArtist = {
-      ...findArtist,
-      ...Dto,
+  async updateArtist(id: string, artistDto: UpdateArtistDTO) {
+    const findedArtist = await this.artistRepository.findOneBy({ id });
+    if (!findedArtist) throw new NotFoundException('Not Found');
+    const updatedArtist = {
+      ...findedArtist,
+      ...artistDto,
     };
-    this.artists = this.artists.map((artist) =>
-      artist.id === id ? updateArtist : artist,
-    );
-    return updateArtist;
+    await this.artistRepository.update(id, updatedArtist);
+    return updatedArtist;
   }
 
-  findByIds(ids: string[]): Artist[] {
-    return this.artists.filter((artist) => ids.includes(artist.id));
+  async findByIds(ids: string[]): Promise<Artist[]> {
+    return this.artistRepository.find({ where: { id: In(ids) } });
   }
 }
