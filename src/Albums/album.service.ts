@@ -36,7 +36,7 @@ export class AlbumService {
       throw new NotFoundException('Not Found');
     }
     this.eventEmitter.emit('delete.album', id);
-    await this.albumRepository.delete(id);  
+    await this.albumRepository.delete(id);
   }
 
   async updateAlbum(id: string, dto: UpdateAlbumDTO) {

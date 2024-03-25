@@ -42,10 +42,7 @@ export class UserService {
     await this.userRepository.delete(id);
   }
 
-  async updateUser(
-    id: string,
-    dto: UpdateUserDTO,
-  ) {
+  async updateUser(id: string, dto: UpdateUserDTO) {
     const findUser = await this.userRepository.findOneBy({ id });
     if (!findUser) {
       throw new NotFoundException('Not Found');

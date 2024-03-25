@@ -24,7 +24,7 @@ export class FavoriteController {
 
   @Delete('/:type/:id')
   @HttpCode(204)
-  async  deleteFavorite(
+  async deleteFavorite(
     @Param('type') type: string,
     @Param('id', new ParseUUIDPipe()) id: string,
   ) {
