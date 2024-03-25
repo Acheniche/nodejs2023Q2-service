@@ -6,10 +6,9 @@ services:
     build: 
       context: .
     env_file: 
-      - .env
+      - .env2
     volumes:
       - .:/user/src/app
-      # - /user/src/app/node_modules
     ports:
       - '${PORT}:${PORT}'
     command: npm run start:dev
@@ -24,7 +23,7 @@ services:
     build: 
       context: ./db/
     env_file: 
-      - .env
+      - .env2
     volumes:
       - db:/var/lib/postgresql/data
       - db-logs:/logs
