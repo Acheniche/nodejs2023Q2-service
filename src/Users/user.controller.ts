@@ -10,7 +10,6 @@ import {
   Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './interface/user.interface';
 import { CreateUserDTO } from './dto/CreateUser.dto';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 
@@ -19,23 +18,23 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  getUsers(): User[] {
+  getUsers() {
     return this.userService.getUsers();
   }
 
   @Post()
-  createUser(@Body() user: CreateUserDTO): User {
+  createUser(@Body() user: CreateUserDTO) {
     return this.userService.createUser(user);
   }
 
   @Get(':id')
-  getUser(@Param('id', new ParseUUIDPipe()) id: string): User {
+  getUser(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.userService.getUser(id);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  deleteUser(@Param('id', new ParseUUIDPipe()) id: string): void {
+  deleteUser(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.userService.deleteUser(id);
   }
 
@@ -43,7 +42,7 @@ export class UserController {
   updateUser(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() track: UpdateUserDTO,
-  ): User {
+  ) {
     return this.userService.updateUser(id, track);
   }
 }
